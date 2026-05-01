@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NinjaSin AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="logo"><div class="logo-name">NINJASIN</div><div class="logo-sub">AI Platform</div></div>
+    <div class="guard-badge" onclick="switchTab('guard')"><div class="guard-label">Animation Engine</div><div class="guard-name">GAURD</div><div class="guard-desc">18-min animation in one go</div></div>
+    <nav class="nav">
+      <div class="nav-section">Tools</div>
+      <div class="nav-item active" onclick="switchTab('guard');setActive(this)"><span class="nav-icon">⚡</span> Gaurd AI</div>
+      <div class="nav-item" onclick="switchTab('convert');setActive(this)"><span class="nav-icon">🔺</span> 2D → 3D</div>
+      <div class="nav-item" onclick="switchTab('ingredients');setActive(this)"><span class="nav-icon">🧪</span> Ingredients</div>
+    </nav>
+  </aside>
+  <main class="main">
+    <div class="topbar"><div class="topbar-title">NINJASIN AI — STUDIO</div></div>
+    <div class="content">
+      <div class="tab-content visible" id="tab-guard">
+        <div class="guard-hero"><div class="guard-hero-title">GAURD</div><div class="guard-hero-sub">Generate up to 18 minutes of animation in a single prompt</div></div>
+        <div class="prompt-wrap">
+          <div class="prompt-top"><div class="prompt-label">Gaurd Prompt</div><div class="prompt-model">gaurd-v1 · blender</div></div>
+          <textarea class="prompt-input" id="promptInput" placeholder="Describe your animation..."></textarea>
+          <div class="prompt-bottom">
+            <div class="prompt-opt on" data-opt="Cinematic" onclick="toggleOpt(this)">⚡ Cinematic</div>
+            <div class="prompt-opt" data-opt="Auto-music" onclick="toggleOpt(this)">🎵 Auto-music</div>
+            <div class="prompt-opt" data-opt="HDR lighting" onclick="toggleOpt(this)">💡 HDR lighting</div>
+            <div class="prompt-opt" data-opt="Camera AI" onclick="toggleOpt(this)">📷 Camera AI</div>
+            <button class="generate-btn" id="generateBtn" onclick="runGuard()">▶ GENERATE</button>
+          </div>
+        </div>
+        <div class="output-area" id="outputArea">
+          <div class="output-header"><div class="output-title">GAURD ENGINE</div><div class="output-status" id="outputStatus">Initializing...</div></div>
+          <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar"></div></div>
+          <div class="output-log" id="outputLog"></div>
+        </div>
+      </div>
+      <div class="tab-content" id="tab-convert"><div class="section-title">2D IMAGE → 3D MODEL</div></div>
+      <div class="tab-content" id="tab-ingredients"><div class="section-title">INGREDIENTS</div></div>
+    </div>
+  </main>
+</div>
+<script src="/app.js"></script>
+</body>
+</html>
