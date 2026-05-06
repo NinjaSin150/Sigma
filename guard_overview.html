@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guard AI Video Generator - Overview</title>
+  <style>
+    :root { --bg:#0b1020; --card:#131a2e; --text:#e6ecff; --muted:#9fb0d9; --accent:#4cc9f0; }
+    body { margin:0; font-family: Inter, Arial, sans-serif; background:linear-gradient(120deg,#0b1020,#11162a); color:var(--text); }
+    .wrap { max-width: 960px; margin: 2rem auto; padding: 0 1rem 3rem; }
+    .hero { display:flex; align-items:center; gap:1rem; margin-bottom:1rem; }
+    .hero img { width:64px; height:64px; }
+    .card { background:var(--card); border:1px solid #273454; border-radius:14px; padding:1rem 1.25rem; margin:0.9rem 0; }
+    h1,h2,h3 { margin:0.4rem 0; }
+    p,li { color:var(--muted); line-height:1.55; }
+    code { background:#0f1528; border:1px solid #273454; border-radius:6px; padding:.1rem .35rem; color:#d6e8ff; }
+    pre { background:#0f1528; border:1px solid #273454; border-radius:10px; padding:0.8rem; overflow:auto; }
+    a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <img src="frontend/assets/guard-logo.svg" alt="Guard logo" />
+      <div>
+        <h1>Guard AI Video Generator</h1>
+        <p>Long-form AI video scaffold (up to 17 minutes) with chunking + stitch pipeline.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>What’s included</h2>
+      <ul>
+        <li>FastAPI backend for projects/jobs.</li>
+        <li>Job validation for <b>5..1020 seconds</b> (17-minute max).</li>
+        <li>Chunk planning for long-duration renders.</li>
+        <li>FFmpeg stitcher scaffold for final clip merge.</li>
+        <li>Static frontend to queue jobs quickly.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>How to run</h2>
+      <pre><code>./scripts/run_backend.sh</code></pre>
+      <p>Then open <code>frontend/index.html</code> in your browser.</p>
+    </div>
+
+    <div class="card">
+      <h2>How to test</h2>
+      <pre><code>cd backend
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+PYTHONPATH=. pytest -q</code></pre>
+      <p>Manual API and frontend test steps are documented in <code>README.md</code>.</p>
+    </div>
+
+    <div class="card">
+      <h2>API Endpoints</h2>
+      <ul>
+        <li><code>GET /health</code></li>
+        <li><code>POST /projects</code></li>
+        <li><code>GET /projects</code></li>
+        <li><code>POST /jobs</code></li>
+        <li><code>GET /jobs/{job_id}</code></li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>
