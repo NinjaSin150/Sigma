@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Guard Mobile</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --card: #121a33;
+      --text: #e8ecff;
+      --muted: #9fb0e8;
+      --primary: #4f8cff;
+      --ok: #22c55e;
+      --danger: #ef4444;
+      --border: #27335f;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: linear-gradient(180deg, #070b17, var(--bg));
+      color: var(--text);
+      padding: 16px;
+    }
+    .wrap { max-width: 680px; margin: 0 auto; }
+    .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+    .brand img { width: 42px; height: 42px; }
+    .brand h1 { font-size: 1.2rem; margin: 0; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    label { font-size: 0.86rem; color: var(--muted); display: block; margin-bottom: 6px; }
+    input, textarea, select, button {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #0c1430;
+      color: var(--text);
+      padding: 11px;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    button {
+      background: var(--primary);
+      border: none;
+      font-weight: 600;
+    }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .status { font-size: 0.9rem; color: var(--muted); }
+    pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: #0a1228;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      font-size: 12px;
+      max-height: 240px;
+      overflow: auto;
+    }
+    .pill {
+      display: inline-block;
+      background: rgba(34,197,94,0.14);
+      color: #9ff3b9;
+      border: 1px solid rgba(34,197,94,0.4);
+      border-radius: 999px;
+      padding: 3px 8px;
+      font-size: 12px;
+      margin-left: 8px;
+    }
+    .hint { font-size: 12px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="brand">
+      <img src="assets/guard-logo.svg" alt="Guard logo" />
+      <h1>Guard Mobile</h1>
+      <span id="healthPill" class="pill" style="display:none;">API Online</span>
+    </div>
+
+    <div class="card">
+      <label for="apiUrl">Backend API URL</label>
+      <input id="apiUrl" placeholder="https://your-guard-api.example.com" />
+      <button id="saveApiBtn">Save API URL</button>
+      <div class="hint">Tip: for local testing from phone, use your computer LAN IP like <code>http://192.168.1.20:8000</code>.</div>
+    </div>
+
+    <div class="card">
+      <h3>Create Project</h3>
+      <label for="projectName">Project Name</label>
+      <input id="projectName" placeholder="My Anime Project" />
+      <button id="createProjectBtn">Create Project</button>
+      <div class="status" id="projectStatus"></div>
+    </div>
+
+    <div class="card">
+      <h3>Create Job (max 17 minutes)</h3>
+      <label for="projectId">Project ID</label>
+      <input id="projectId" placeholder="Paste Project ID" />
+
+      <label for="prompt">Prompt</label>
+      <textarea id="prompt" rows="4" placeholder="Describe your animation..."></textarea>
+
+      <div class="row">
+        <div>
+          <label for="duration">Duration (seconds)</label>
+          <input id="duration" type="number" min="5" max="1020" value="120" />
+        </div>
+        <div>
+          <label for="mode">Mode</label>
+          <select id="mode">
+            <option value="text_to_video">text_to_video</option>
+            <option value="image_to_video">image_to_video</option>
+          </select>
+        </div>
+      </div>
+
+      <button id="createJobBtn">Queue Job</button>
+      <div class="status" id="jobStatus"></div>
+    </div>
+
+    <div class="card">
+      <h3>Check Job</h3>
+      <label for="jobId">Job ID</label>
+      <input id="jobId" placeholder="Paste Job ID" />
+      <button id="checkJobBtn">Get Job Status</button>
+      <pre id="output">Ready.</pre>
+    </div>
+  </div>
+
+  <script>
+    const els = {
+      apiUrl: document.getElementById('apiUrl'),
+      saveApiBtn: document.getElementById('saveApiBtn'),
+      projectName: document.getElementById('projectName'),
+      createProjectBtn: document.getElementById('createProjectBtn'),
+      projectStatus: document.getElementById('projectStatus'),
+      projectId: document.getElementById('projectId'),
+      prompt: document.getElementById('prompt'),
+      duration: document.getElementById('duration'),
+      mode: document.getElementById('mode'),
+      createJobBtn: document.getElementById('createJobBtn'),
+      jobStatus: document.getElementById('jobStatus'),
+      jobId: document.getElementById('jobId'),
+      checkJobBtn: document.getElementById('checkJobBtn'),
+      output: document.getElementById('output'),
+      healthPill: document.getElementById('healthPill')
+    };
+
+    const DEFAULT_API = 'http://127.0.0.1:8000';
+    const KEY = 'guard_api_url';
+
+    function getApi() {
+      return (localStorage.getItem(KEY) || DEFAULT_API).replace(/\/$/, '');
+    }
+
+    function setOutput(obj) {
+      els.output.textContent = typeof obj === 'string' ? obj : JSON.stringify(obj, null, 2);
+    }
+
+    async function api(path, options = {}) {
+      const base = getApi();
+      const res = await fetch(`${base}${path}`, {
+        headers: {'Content-Type': 'application/json', ...(options.headers || {})},
+        ...options
+      });
+      const text = await res.text();
+      const body = text ? JSON.parse(text) : {};
+      if (!res.ok) throw new Error(JSON.stringify(body));
+      return body;
+    }
+
+    async function checkHealth() {
+      try {
+        await api('/health');
+        els.healthPill.style.display = 'inline-block';
+      } catch {
+        els.healthPill.style.display = 'none';
+      }
+    }
+
+    els.saveApiBtn.onclick = async () => {
+      localStorage.setItem(KEY, els.apiUrl.value.trim() || DEFAULT_API);
+      setOutput(`Saved API URL: ${getApi()}`);
+      await checkHealth();
+    };
+
+    els.createProjectBtn.onclick = async () => {
+      try {
+        const project = await api('/projects', {
+          method: 'POST',
+          body: JSON.stringify({name: els.projectName.value.trim()})
+        });
+        els.projectStatus.textContent = `Created: ${project.id}`;
+        els.projectId.value = project.id;
+        setOutput(project);
+      } catch (e) {
+        setOutput(e.message);
+      }
+    };
+
+    els.createJobBtn.onclick = async () => {
+      try {
+        const payload = {
+          project_id: els.projectId.value.trim(),
+          prompt: els.prompt.value.trim(),
+          duration_seconds: Number(els.duration.value),
+          mode: els.mode.value
+        };
+        const job = await api('/jobs', {method: 'POST', body: JSON.stringify(payload)});
+        els.jobStatus.textContent = `Queued job: ${job.id} | chunks: ${job.chunks_total}`;
+        els.jobId.value = job.id;
+        setOutput(job);
+      } catch (e) {
+        setOutput(e.message);
+      }
+    };
+
+    els.checkJobBtn.onclick = async () => {
+      try {
+        const job = await api(`/jobs/${els.jobId.value.trim()}`);
+        setOutput(job);
+      } catch (e) {
+        setOutput(e.message);
+      }
+    };
+
+    els.apiUrl.value = getApi();
+    checkHealth();
+  </script>
+</body>
+</html>
