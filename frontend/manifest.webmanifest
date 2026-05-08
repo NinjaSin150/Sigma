@@ -1,0 +1,16 @@
+{
+  "name": "Guard Mobile",
+  "short_name": "Guard",
+  "start_url": "./guard-mobile.html",
+  "display": "standalone",
+  "background_color": "#0b1020",
+  "theme_color": "#0b1020",
+  "icons": [
+    {
+      "src": "assets/guard-logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

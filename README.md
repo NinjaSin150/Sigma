@@ -110,3 +110,14 @@ You can open the mobile-optimized app directly:
 - File: `frontend/guard-mobile.html`
 
 If hosting locally and opening from your phone, start backend on your computer and set API URL in the page to your LAN IP (example: `http://192.168.1.20:8000`).
+
+
+#### Install on mobile (PWA-style)
+
+- Open `frontend/guard-mobile.html` from a hosted URL (not `file://` for best support).
+- Android (Chrome): tap **Install Guard App** or browser Install banner.
+- iPhone (Safari): tap **Share → Add to Home Screen**.
+
+Added files for this:
+- `frontend/manifest.webmanifest`
+- `frontend/sw.js`
